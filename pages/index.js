@@ -1,6 +1,5 @@
 import React from "react";
 import LoginBtn from "../components/LoginBtn";
-import Welcome from "../components/Standard";
 import Navbar from "../components/Navbar";
 import NoteCard from "../components/NoteCard";
 

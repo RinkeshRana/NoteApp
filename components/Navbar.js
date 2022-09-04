@@ -30,7 +30,10 @@ function Navbar({ showUploadNoteBtn }) {
           show ? "" : "shadow-md"
         }`}
       >
-        <div className="flex items-center">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => router.push("/")}
+        >
           <BookOpenIcon color="black" className="md:w-8 h-6 md:h-8 w-6" />
           <span className="text-black md:ml-3 md:text-lg  font-bold">
             NoteBook
@@ -47,7 +50,7 @@ function Navbar({ showUploadNoteBtn }) {
         <div className="hidden md:block ">
           <div className={"flex space-x-9 text-gray-500 items-center "}>
             <button
-              className={`bg-blue-500 h-10 w-36 rounded-md text-white ${
+              className={`bg-indigo-500 hover:bg-indigo-600 h-10 w-36 rounded-md text-white ${
                 showUploadNoteBtn ? "hidden" : "block"
               } `}
               onClick={uploadNote}
