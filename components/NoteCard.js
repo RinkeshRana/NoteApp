@@ -23,8 +23,8 @@ function NoteCard() {
       />
 
       <div className="p-5">
-        <h5 className="mb-2 text-base md:text-2xl font-bold tracking-tight text-gray-900 ">
-          Physics - Chapter 7
+        <h5 className="mb-2 text-base md:text-xl font-bold tracking-tight text-gray-900 truncate">
+          Physics - Chapter 7 Lorem ipsum dolor
         </h5>
         <p className="text-gray-700 text-sm md:text-base">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
@@ -36,7 +36,7 @@ function NoteCard() {
 
         {/* Likes and comments count */}
         <div className="mt-2 flex space-x-2">
-          <div className="flex ">
+          <div className="flex items-center">
             <HeartIcon className="md:w-6 md:h-6 h-4 w-4 " color="red" />
             <span className="ml-1 text-sm md:text-md">24</span>
           </div>

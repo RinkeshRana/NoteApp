@@ -24,9 +24,9 @@ function Navbar({ showUploadNoteBtn }) {
   };
 
   return (
-    <div>
+    <div className="border-b ">
       <div
-        className={`flex items-center justify-evenly py-5 border-b ${
+        className={`flex items-center shadow-indigo-200 justify-evenly py-5 border-b ${
           show ? "" : "shadow-md"
         }`}
       >
