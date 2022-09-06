@@ -21,46 +21,46 @@ function UploadSection() {
   const [fileList, setFileList] = useState([]);
   const fileListRef = ref(storage, `pdf`);
 
-  const uploadPDF = () => {
-    if (pdfUpload == null) return;
+  // const uploadPDF = () => {
+  //   if (pdfUpload == null) return;
 
-    const fileref = ref(storage, `${session.user.email}/pdf/${pdfUpload.name}`);
-    uploadBytes(fileref, pdfUpload).then(async (res) => {
-      const downloadURL = await getDownloadURL(fileref);
-      console.log(downloadURL);
-      alert("PDF Uploaded");
-    });
-  };
+  //   const fileref = ref(storage, `${session.user.email}/pdf/${pdfUpload.name}`);
+  //   uploadBytes(fileref, pdfUpload).then(async (res) => {
+  //     const downloadURL = await getDownloadURL(fileref);
+  //     console.log(downloadURL);
+  //     alert("PDF Uploaded");
+  //   });
+  // };
 
-  const uploadThumbnail = () => {
-    if (thumbnailUpload == null) return;
+  // const uploadThumbnail = () => {
+  //   if (thumbnailUpload == null) return;
 
-    const fileref = ref(
-      storage,
-      `${session.user.email}/pdf/${thumbnailUpload.name}`
-    );
-    uploadBytes(fileref, thumbnailUpload).then(async () => {
-      const downloadURL = await getDownloadURL(fileref);
-      console.log(downloadURL);
-      alert("PDF Uploaded");
-    });
-  };
+  //   const fileref = ref(
+  //     storage,
+  //     `${session.user.email}/pdf/${thumbnailUpload.name}`
+  //   );
+  //   uploadBytes(fileref, thumbnailUpload).then(async () => {
+  //     const downloadURL = await getDownloadURL(fileref);
+  //     console.log(downloadURL);
+  //     alert("PDF Uploaded");
+  //   });
+  // };
 
-  useEffect(() => {
-    listAll(fileListRef).then((res) => {
-      res.items.forEach((item) => {
-        getDownloadURL(item).then((url) => {
-          setFileList((prev) => [prev, url]);
-        });
-      });
-    });
-  }, [fileListRef]);
+  // useEffect(() => {
+  //   listAll(fileListRef).then((res) => {
+  //     res.items.forEach((item) => {
+  //       getDownloadURL(item).then((url) => {
+  //         setFileList((prev) => [prev, url]);
+  //       });
+  //     });
+  //   });
+  // }, [fileListRef]);
 
   const submitUpload = async () => {
     // add doc
     const docRef = await addDoc(collection(db, "notes"), {
-      title: "title",
-      description: "description",
+      title: title,
+      description: description,
       email: session.user.email,
       name: session.user.name,
       timestamp: serverTimestamp(),
@@ -69,8 +69,8 @@ function UploadSection() {
     console.log("Document written with ID: ", docRef.id);
 
     // PDF Upload
-    const pdfref = ref(storage, `${session.user.email}/pdf/${pdfUpload.name}`);
-    uploadBytes(pdfref, pdfUpload).then(async (res) => {
+    const pdfref = ref(storage, `${docRef.id}/pdf/${pdfUpload.name}`);
+    uploadBytes(pdfref, pdfUpload).then(async () => {
       const downloadURL = await getDownloadURL(pdfref);
       console.log(downloadURL);
       alert("PDF Uploaded");
@@ -82,7 +82,7 @@ function UploadSection() {
     // Thumbnail Upload
     const thumbnailref = ref(
       storage,
-      `${session.user.email}/pdf/${thumbnailUpload.name}`
+      `${docRef.id}/thumbnail/${thumbnailUpload.name}`
     );
     uploadBytes(thumbnailref, thumbnailUpload).then(async () => {
       const downloadURL = await getDownloadURL(thumbnailref);
@@ -90,10 +90,10 @@ function UploadSection() {
       alert("Thumbnail Uploaded");
       await updateDoc(doc(db, "notes", docRef.id), {
         thumbnailURL: downloadURL,
+        id: docRef.id,
       });
     });
   };
-
   return (
     <div>
       <section className="text-gray-400 body-font relative">
@@ -113,8 +113,6 @@ function UploadSection() {
               <input
                 required
                 type="text"
-                id="name"
-                name="name"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
@@ -129,11 +127,8 @@ function UploadSection() {
                 Short Description
               </label>
               <textarea
-                id="message"
-                name="message"
                 value={description}
-                required
-                onChange={(e) => setDescription(e.target.description)}
+                onChange={(e) => setDescription(e.target.value)}
                 className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
               ></textarea>
             </div>
@@ -196,7 +191,11 @@ function UploadSection() {
                   <iframe src={item} width={100} height={100} key={index} />
                 );
               })}
-              <NoteCard />
+              <NoteCard
+                title={title}
+                description={description}
+                username={session.user.name}
+              />
             </div>
           </div>
         </div>

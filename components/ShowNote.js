@@ -1,35 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { pdfjs, Document, Page } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 import { HeartIcon } from "@heroicons/react/24/outline";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useRouter } from "next/router";
 
-function ShowNote() {
+function ShowNote({ title, description, username, pdfurl }) {
   return (
     <div>
       <section className="text-gray-600 body-font overflow-hidden">
         <div className="container px-5 py-7 lg:py-24 mx-auto">
           <div className="lg:w-4/5 mx-auto flex flex-wrap justify-center items-center">
             <div className="border shadow-md">
-              <Document file="/sample.pdf">
+              <Document file={pdfurl}>
                 <Page pageIndex={0} />
               </Document>
             </div>
             <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0 ">
               <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">
-                Physics Chapter 7
+                {title}
               </h1>
-              <p className="leading-relaxed ">
-                Fam locavore kickstarter distillery. Mixtape chillwave tumeric
-                sriracha taximy chia microdosing tilde DIY. XOXO fam indxgo
-                juiceramps cornhole raw denim forage brooklyn. Everyday carry +1
-                seitan poutine tumeric. Gastropub blue bottle austin listicle
-                pour-over, neutra jean shorts keytar banjo tattooed umami
-                cardigan.
-              </p>
+              <p className="leading-relaxed ">{description}</p>
               <div className="flex mt-6 items-center pb-5 border-b-2 border-gray-100 mb-5"></div>
               <div className="flex items-center">
                 <span className="title-font font-medium text-sm md:text-2xl text-gray-700">
-                  Rinkesh Rana
+                  {username}
                 </span>
                 <button className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
                   Comments
