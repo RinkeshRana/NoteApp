@@ -23,10 +23,12 @@ function NoteCard({ title, description, thumbnail, username, id }) {
       />
 
       <div className="p-5">
-        <h5 className="mb-2 text-base md:text-xl font-bold tracking-tight text-gray-900 truncate">
+        <h5 className="mb-2 text-base md:text-xl font-bold tracking-tight text-gray-900 line-clamp-2">
           {title}
         </h5>
-        <p className="text-gray-700 text-sm md:text-base">{description}</p>
+        <p className="text-gray-700 text-sm md:text-base line-clamp-3">
+          {description}
+        </p>
         {/* who uploaded */}
 
         <div className="mt-2 text-gray-500">Uploaded by: {username} </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import NoteCard from "./NoteCard";
 import { storage, db } from "../firebase";
 import { ref, uploadBytes, listAll, getDownloadURL } from "firebase/storage";
@@ -10,53 +10,41 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/router";
+import LoadingSpinner from "./LoadingSpinner";
 
 function UploadSection() {
   const { data: session } = useSession();
-  const [disableButton, setDisableButton] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [pdfUpload, setPdfUpload] = useState(null);
   const [thumbnailUpload, setThumbnailUpload] = useState(null);
-  const [fileList, setFileList] = useState([]);
-  const fileListRef = ref(storage, `pdf`);
+  const [showSpinner, setShowSpinner] = useState(false);
+  const pdfRef = useRef(null);
+  const thumbnailRef = useRef(null);
+  const router = useRouter();
 
-  // const uploadPDF = () => {
-  //   if (pdfUpload == null) return;
-
-  //   const fileref = ref(storage, `${session.user.email}/pdf/${pdfUpload.name}`);
-  //   uploadBytes(fileref, pdfUpload).then(async (res) => {
-  //     const downloadURL = await getDownloadURL(fileref);
-  //     console.log(downloadURL);
-  //     alert("PDF Uploaded");
-  //   });
-  // };
-
-  // const uploadThumbnail = () => {
-  //   if (thumbnailUpload == null) return;
-
-  //   const fileref = ref(
-  //     storage,
-  //     `${session.user.email}/pdf/${thumbnailUpload.name}`
-  //   );
-  //   uploadBytes(fileref, thumbnailUpload).then(async () => {
-  //     const downloadURL = await getDownloadURL(fileref);
-  //     console.log(downloadURL);
-  //     alert("PDF Uploaded");
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   listAll(fileListRef).then((res) => {
-  //     res.items.forEach((item) => {
-  //       getDownloadURL(item).then((url) => {
-  //         setFileList((prev) => [prev, url]);
-  //       });
-  //     });
-  //   });
-  // }, [fileListRef]);
+  useEffect(() => {
+    if (!session) {
+      toast.error("Please login to upload notes");
+      router.push("/signin");
+      return;
+    }
+  }, [router, session]);
 
   const submitUpload = async () => {
+    if (!title || !description || !pdfUpload || !thumbnailUpload) {
+      toast.error("Please fill all the fields");
+      return;
+    }
+    if (!session) {
+      router.push("/signin");
+      return;
+    }
+
+    setShowSpinner(true);
     // add doc
     const docRef = await addDoc(collection(db, "notes"), {
       title: title,
@@ -66,14 +54,11 @@ function UploadSection() {
       timestamp: serverTimestamp(),
     });
 
-    console.log("Document written with ID: ", docRef.id);
-
     // PDF Upload
     const pdfref = ref(storage, `${docRef.id}/pdf/${pdfUpload.name}`);
     uploadBytes(pdfref, pdfUpload).then(async () => {
       const downloadURL = await getDownloadURL(pdfref);
       console.log(downloadURL);
-      alert("PDF Uploaded");
       await updateDoc(doc(db, "notes", docRef.id), {
         pdfURL: downloadURL,
       });
@@ -86,16 +71,24 @@ function UploadSection() {
     );
     uploadBytes(thumbnailref, thumbnailUpload).then(async () => {
       const downloadURL = await getDownloadURL(thumbnailref);
-      console.log(downloadURL);
-      alert("Thumbnail Uploaded");
       await updateDoc(doc(db, "notes", docRef.id), {
         thumbnailURL: downloadURL,
         id: docRef.id,
       });
+      toast.success("Your note has been uploaded successfully.!");
+      setDescription("");
+      setTitle("");
+      setPdfUpload(null);
+      setThumbnailUpload(null);
+      pdfRef.current.value = "";
+      thumbnailRef.current.value = "";
+      setShowSpinner(false);
     });
   };
   return (
-    <div>
+    <div className="overflow-hidden">
+      <ToastContainer />
+      <LoadingSpinner show={showSpinner} />
       <section className="text-gray-400 body-font relative">
         <div className="container px-5 py-24 mx-auto flex md:flex-nowrap flex-wrap justify-center">
           {/* left */}
@@ -140,6 +133,8 @@ function UploadSection() {
                 PDF
               </label>
               <input
+                ref={pdfRef}
+                name="pdf"
                 required
                 type="file"
                 className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out file:py-2 file:px-4
@@ -148,7 +143,12 @@ function UploadSection() {
                 file:bg-indigo-50 file:text-indigo-700
                 hover:file:bg-indigo-100  file:cursor-pointer"
                 onChange={(e) => {
-                  setPdfUpload(e.target.files[0]);
+                  if (!/(\.pdf)$/i.exec(e.target.value)) {
+                    e.target.value = "";
+                    alert("Please upload a PDF file");
+                  } else {
+                    setPdfUpload(e.target.files[0]);
+                  }
                 }}
               />
             </div>
@@ -160,6 +160,9 @@ function UploadSection() {
                 Thumbnail ( You can upload image of first page! )
               </label>
               <input
+                ref={thumbnailRef}
+                name="thumbnail"
+                accept="image/*"
                 required=""
                 type="file"
                 className="w-full file:cursor-pointer  bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out  file:mr-4 file:py-2 file:px-4
@@ -168,7 +171,13 @@ function UploadSection() {
                 file:bg-indigo-50 file:text-indigo-700
                 hover:file:bg-indigo-100"
                 onChange={(e) => {
-                  setThumbnailUpload(e.target.files[0]);
+                  if (!/(\.png|\.jpg|\.jpeg)$/i.exec(e.target.value)) {
+                    alert("Please upload a image file");
+                    e.target.value = "";
+                  } else {
+                    setThumbnailUpload(e.target.files[0]);
+                    console.log(URL.createObjectURL(e.target.files[0]));
+                  }
                 }}
               />
             </div>
@@ -186,15 +195,13 @@ function UploadSection() {
           {/* right */}
           <div className="lg:w-2/3 md:w-1/2 bg-gray-200 shadow rounded-lg overflow-hidden sm:ml-10 p-10 flex items-end justify-center relative mt-8 md:mt-0">
             <div>
-              {fileList.map((item, index) => {
-                return (
-                  <iframe src={item} width={100} height={100} key={index} />
-                );
-              })}
               <NoteCard
+                thumbnail={
+                  thumbnailUpload ? URL?.createObjectURL(thumbnailUpload) : ""
+                }
                 title={title}
                 description={description}
-                username={session.user.name}
+                username={session?.user.name}
               />
             </div>
           </div>

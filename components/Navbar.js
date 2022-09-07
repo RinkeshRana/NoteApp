@@ -19,14 +19,14 @@ function Navbar({ showUploadNoteBtn }) {
     if (session) {
       router.push("/upload");
     } else {
-      signIn();
+      signIn("google");
     }
   };
 
   return (
     <div className="border-b ">
       <div
-        className={`flex items-center shadow-indigo-200 justify-evenly py-5 border-b ${
+        className={`flex items-center justify-evenly py-5 border-b shadow-indigo-100 ${
           show ? "" : "shadow-md"
         }`}
       >

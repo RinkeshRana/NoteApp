@@ -2,11 +2,11 @@ import React from "react";
 import Navbar from "../../components/Navbar";
 import ShowNote from "../../components/ShowNote";
 
-function note({data :{title,description, username, pdfURL}}) {
+function note({data :{title,description, name, pdfURL}}) {
   return (
     <div>
       <Navbar />
-      <ShowNote title={title} description={description} username={username} pdfurl={pdfURL} />
+      <ShowNote title={title} description={description} username={name} pdfurl={pdfURL} />
     </div>
   );
 }

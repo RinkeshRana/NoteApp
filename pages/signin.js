@@ -6,7 +6,7 @@ export default function SignIn({ providers }) {
       {Object.values(providers).map((provider) => (
         <div key={provider.name}>
           <button onClick={() => signIn(provider.id)}>
-            Sign in with {provider.name}
+            Sign in with {provider.name} {console.log(provider.id)}
           </button>
         </div>
       ))}
