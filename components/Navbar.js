@@ -27,7 +27,7 @@ function Navbar({ showUploadNoteBtn }) {
     <div className="border-b ">
       <div
         className={`flex items-center justify-evenly py-5 border-b shadow-indigo-100 ${
-          show ? "" : "shadow-md"
+          show ? "" : "shadow-md "
         }`}
       >
         <div
@@ -86,7 +86,7 @@ function Navbar({ showUploadNoteBtn }) {
         />
       </div>
       <div
-        className={`space-y-5 shadow-md p-3 md:hidden  ${
+        className={`space-y-5 shadow-md p-3 md:hidden shadow-indigo-100 ${
           !show ? "hidden" : "block"
         }`}
       >

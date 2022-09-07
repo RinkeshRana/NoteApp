@@ -6,18 +6,18 @@ import {
   ChatBubbleLeftEllipsisIcon,
 } from "@heroicons/react/24/solid";
 
-function NoteCard({ title, description, thumbnail, username, id }) {
+function NoteCard({ title, description, thumbnail, username, id, open }) {
   const router = useRouter();
   const openNote = () => router.push(`/note/${id}`);
   return (
     <div
       className="md:w-72 w-52 bg-white rounded-lg border border-gray-200 shadow-md cursor-pointer m-3"
-      onClick={openNote}
+      onClick={open ? null : openNote}
     >
       <Image
         className="rounded-t-lg"
         src={thumbnail}
-        alt="Image not available"
+        alt="Upload an image to see preview"
         width={500}
         height={500}
       />

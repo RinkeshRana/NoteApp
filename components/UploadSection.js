@@ -202,6 +202,7 @@ function UploadSection() {
                 title={title}
                 description={description}
                 username={session?.user.name}
+                open="true"
               />
             </div>
           </div>

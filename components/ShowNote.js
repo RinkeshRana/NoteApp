@@ -14,7 +14,6 @@ function ShowNote({ title, description, username, pdfurl }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      console.log(window.innerWidth);
       setWindowWidth(window.innerWidth);
       addEventListener("resize", () => {
         setWindowWidth(window.innerWidth);
@@ -23,7 +22,9 @@ function ShowNote({ title, description, username, pdfurl }) {
 
     return () => {
       removeEventListener("resize", () => {
-        setWindowWidth(window.innerWidth);
+        if (typeof window !== "undefined") {
+          removeEventListener("resize");
+        }
       });
     };
   }, []);
@@ -40,7 +41,7 @@ function ShowNote({ title, description, username, pdfurl }) {
                 loading={"Loading..."}
               >
                 <Page
-                  width={windowWidth < 568 ? screen.width - 20 : 500}
+                  width={windowWidth < 568 ? windowWidth - 20 : 500}
                   pageIndex={pageNumber}
                   className="shadow-md"
                 />
@@ -51,7 +52,7 @@ function ShowNote({ title, description, username, pdfurl }) {
                 {title}
               </h1>
               <p className="leading-relaxed ">{description}</p>
-              <div className="flex items-center space-x-3  mt-5">
+              <div className="flex items-center justify-center md:justify-start space-x-3  mt-5">
                 <button
                   onClick={() => {
                     if (pageNumber !== 0) {
