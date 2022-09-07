@@ -13,7 +13,7 @@ function note({data :{title,description, name, pdfURL}}) {
 
 export async function getServerSideProps(context) {
   const { note } = context.query;
-  const res = await fetch(`http://localhost:3000/api/fetchnote?id=${note}`);
+  const res = await fetch(`https://note-app-olive.vercel.app/api/fetchnote?id=${note}`);
   const data = await res.json();
   return {
     props: {
